@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>First Draft HW #6</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <!-- <link rel="stylesheet" type="text/css" href="Assets/style.css"> -->
+<style>
+#container {
+    width: 700px;
+}
+
+img {
+    /* /* clear: both; */
+    display: inline-block;
+    margin-left: 0px;
+    /* float: left; */ 
+}
+#gif-view {
+    width: 900px;
+
+}
+p {
+    /* clear: both; */
+}
+  button {
+      margin-top: 10px;
+      margin-left: 10px;
+      background: lightblue;     
+  }
+  h1 {
+      text-align: center;
+      line-height: 150%;
+      /* padding-bottom: 5px; */
+  }
+  h3 {
+      text-align: center;
+      margin-top: 10px;
+  }
+  .form-control {
+      margin-bottom: 10px;
+  }
+  .btn {
+      margin-left: 0px; 
+      /* margin-top: 20px; */
+  }
+  button:hover {
+      background: darkblue;
+      color: white;
+      font-weight: bold;
+  }
+</style>
+
+</head>
+<body>
+<div class="container">
+  <h1>*** Git your Giphy on! ***</h1>
+  <h3>Try a button below, or make your own in the search box</h3>
+  <!-- Create the header "About me" -->
+  <div class="row">
+    <div class="col-lg-12">       
+      <div id="buttons-view">
+        <button data-value="cat" class="btn btn-primary btn-sm">Mustang</button>
+        <button data-value="dog" class="btn btn-primary btn-sm">Camero</button>
+        <button data-value="bird" class="btn btn-primary btn-sm">Corvette</button>
+      </div>  
+      <br>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-8">
+      <div id="gif-view"></div>   
+    </div>
+    
+    <div class="col-4">
+      <div class="form-group">
+        <form id="topic-form">
+          <!-- <label for="formGroupExampleInput">Get more Gifs</label> -->
+          <label for="topic-input">Get more Gifs</label>
+          <!-- <input type="text" id="topic-input"> -->
+          <input id="topic-input" class="form-control mr-sm-2" type="text" placeholder="Type here">
+          <button id="add-topic" class="btn btn-success btn-sm my-2 my-sm-0" type="submit">Search</button>
+        </form>          
+      </div>
+    </div>       
+  </div> <!-- close row/col 4 div  -->
+</div> <!-- closing container div -->
+<!-- ******************************* -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script type="text/javascript">
+
+var topics = ["Camaro","Corvette","Mustang"];
+
+function displayTopicInfo() {
+  var topic = $(this).attr("data-name");
+  var queryURL="https://api.giphy.com/v1/gifs/search?q="+topic+"&api_key=GAtjhrAchkI22yJmUipApW7tZqKlVwvo&limit=5";
+  console.log(topic);
+  $.ajax({
+    url: queryURL,
+    method: "GET"   
+  })
+    .then(function(response) {
+        // console.log(response);
+      var results = response.data;
+      
+      for (var i=0; i<results.length; i++) {
+        if (results[i].rating !== "r" && results[i].rating !== "pg-13") {
+          var topicDiv = $("<div class='topic'>");    
+          var rating = results[i].rating; 
+          var pRating = $("<p>").text("Rating: "+rating);    
+          var topicGif = $("<img>");
+          topicGif.attr("src", results[i].images.fixed_height.url);
+          topicDiv.prepend(pRating);
+          topicDiv.prepend(topicDiv);
+          $("#gif-view").prepend(pRating); 
+          $("#gif-view").prepend(topicGif);
+         
+        }
+      } 
+  });
+}
+
+function renderButtons() {
+// Deleting the movies prior to adding new movies
+// (this is necessary otherwise we will have repeat buttons)
+  $("#buttons-view").empty();
+    // Looping through the array of movies
+  for (var i = 0; i < topics.length; i++) {
+    // Then dynamicaly generating buttons for each movie in the array
+    // This code $("<button>") is all jQuery needs to create the start and end tag. (<button></button>)
+  var a = $("<button>");
+    // Adding a class of movie to our button
+  a.addClass("topic-btn");
+    // Adding a data-attribute
+  a.attr("data-name", topics[i]);
+    // Providing the initial button text
+  a.text(topics[i]);
+    // Adding the button to the HTML
+  $("#buttons-view").append(a);
+  }
+}
+
+$("#add-topic").on("click",function(event) {
+  event.preventDefault();
+  var topic = $("#topic-input").val().trim();
+  console.log("This is the var topic"+topic);
+  
+  topics.push(topic);
+  renderButtons();
+});
+
+$(document).on("click", ".topic-btn",displayTopicInfo);
+renderButtons();
+</script>
+</body>
+</html>
