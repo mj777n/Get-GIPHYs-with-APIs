@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
   <!-- <link rel="stylesheet" type="text/css" href="Assets/style.css"> -->
 <style>
+
 #container {
     width: 700px;
 }
@@ -15,7 +16,8 @@
 img {
     /* /* clear: both; */
     display: inline-block;
-    margin-left: 0px;
+    margin-left: 5px;
+    margin-bottom: 20px;
     /* float: left; */ 
 }
 #gif-view {
@@ -71,11 +73,11 @@ p {
   </div>
 
   <div class="row">
-    <div class="col-8">
+    <div class="col-9 gif">
       <div id="gif-view"></div>   
     </div>
     
-    <div class="col-4">
+    <div class="col-3 text-right">
       <div class="form-group">
         <form id="topic-form">
           <!-- <label for="formGroupExampleInput">Get more Gifs</label> -->
@@ -91,69 +93,108 @@ p {
 <!-- ******************************* -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script type="text/javascript">
+  // set up array to hold topics (buttons); starter set to begin
+var topics = ["Camaro","Corvette","Mustang","Cadillac"];
 
-var topics = ["Camaro","Corvette","Mustang"];
+$(document).ready(function() {
 
-function displayTopicInfo() {
+   // function with AJAX call on data attr of calling click event 
+function displayTopicInfo() {  
   var topic = $(this).attr("data-name");
-  var queryURL="https://api.giphy.com/v1/gifs/search?q="+topic+"&api_key=GAtjhrAchkI22yJmUipApW7tZqKlVwvo&limit=5";
-  console.log(topic);
+  var queryURL="https://api.giphy.com/v1/gifs/search?q="+topic+"&api_key=GAtjhrAchkI22yJmUipApW7tZqKlVwvo&limit=10";
+  console.log(topic); 
   $.ajax({
     url: queryURL,
     method: "GET"   
   })
     .then(function(response) {
-        // console.log(response);
+        // grab response from AJAX call, hold in variable "results"
       var results = response.data;
-      
+        // for-Loop for checking all images retreived        
       for (var i=0; i<results.length; i++) {
-        if (results[i].rating !== "r" && results[i].rating !== "pg-13") {
-          var topicDiv = $("<div class='topic'>");    
+        if (results[i].rating !== "r" && results[i].rating !== "pg-13") 
+        {   // setup variable for rating        
           var rating = results[i].rating; 
-          var pRating = $("<p>").text("Rating: "+rating);    
+            // setup variable, & assign it a "p" tag, with text for dom
+          var pRating = $("<p>").text("Rating: "+rating);
+            // setup variable, & assign it a "div" tag with class name   
+          var topicDiv = $("<div class='topicDiv'>");
+            // setup variable, & assign "img" tag
           var topicGif = $("<img>");
-          topicGif.attr("src", results[i].images.fixed_height.url);
-          topicDiv.prepend(pRating);
-          topicDiv.prepend(topicDiv);
+            // assign still-image, attributes for animated-image, state=still
+          topicGif.attr("src",results[i].images.fixed_height_still.url);
+          topicGif.attr("data-still",results[i].images.fixed_height_still.url);
+          topicGif.attr("data-animate", results[i].images.fixed_height.url);
+          topicGif.attr("data-state", "still");
+          topicGif.addClass("gif");  // assign class .gif for click event on images
+          // topicDiv.prepend("<p>Rating: "+rating+"</p>");          
+          //
+          topicDiv.append(pRating);
+          topicDiv.prepend(topicGif);
+
           $("#gif-view").prepend(pRating); 
-          $("#gif-view").prepend(topicGif);
-         
+          $("#gif-view").prepend(topicGif);       
+        }  // end if statement
+      } // end for-Loop
+    
+      $(".gif").on("click", function(){
+         var state = $(this).attr("data-state");
+           console.log("state = "+state);
+
+        if (state === "still") { 
+          $(this).attr("src", $(this).attr("data-animate"));
+          console.log("if still, attr = "+$(topicGif).attr("data-animate"));
+          $(this).attr("data-state", "animate");  
+        } else { 
+          $(this).attr("src", $(this).attr("data-still"));
+          $(this).attr("data-state", "still");  
         }
-      } 
+      });  // end .gif on click function    
+    }); // end .then function after AJAX call
+  } // end displayTopicInfo function
+
+
+  function renderButtons() {
+      // Deleting the movies prior to adding new movies
+    $("#buttons-view").empty();
+      // Looping through the array of movies
+    for (var i = 0; i < topics.length; i++) {
+        // Then dynamicaly generating buttons for each movie in the array
+        // Using $("<button>") to create the start and end tag.
+      var a = $("<button>");
+        // Adding a class of topic-btn to each button
+      a.addClass("topic-btn gif");
+        // Adding a data-attribute
+      a.attr("data-name", topics[i]);
+
+        // Providing the each button text from array of topics
+      a.text(topics[i]);
+        // Adding the button to the dom
+      $("#buttons-view").append(a);
+    }  // end for-Loop appending buttons for display
+  }  //close renderButtons function
+// ***************** END FUNCTION renderButtons() ****************
+
+// ***************************************************************
+// ***** BEGIN Program - waiting for click event from user *******
+// ***************************************************************
+
+    // if user enters a topic to search on
+  $("#add-topic").on("click",function(event) {
+    event.preventDefault();
+      // create variable topic to grab event (keyed topic from search box)
+    var topic = $("#topic-input").val().trim();
+      // push new topic entered into topics array
+    topics.push(topic);
+      // call renderButtons to display buttons on dom
+    renderButtons();
   });
-}
 
-function renderButtons() {
-// Deleting the movies prior to adding new movies
-// (this is necessary otherwise we will have repeat buttons)
-  $("#buttons-view").empty();
-    // Looping through the array of movies
-  for (var i = 0; i < topics.length; i++) {
-    // Then dynamicaly generating buttons for each movie in the array
-    // This code $("<button>") is all jQuery needs to create the start and end tag. (<button></button>)
-  var a = $("<button>");
-    // Adding a class of movie to our button
-  a.addClass("topic-btn");
-    // Adding a data-attribute
-  a.attr("data-name", topics[i]);
-    // Providing the initial button text
-  a.text(topics[i]);
-    // Adding the button to the HTML
-  $("#buttons-view").append(a);
-  }
-}
-
-$("#add-topic").on("click",function(event) {
-  event.preventDefault();
-  var topic = $("#topic-input").val().trim();
-  console.log("This is the var topic"+topic);
+    // if user clicks on a button on the dom already, pass it to displayTopicInfo
+  $(document).on("click", ".topic-btn",displayTopicInfo);
+  renderButtons();  // call to renderButtons to display initial buttons from array
+}); // end document.ready function (end of code)
   
-  topics.push(topic);
-  renderButtons();
-});
-
-$(document).on("click", ".topic-btn",displayTopicInfo);
-renderButtons();
 </script>
 </body>
 </html>
