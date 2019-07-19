@@ -12,7 +12,9 @@
 #container {
     width: 700px;
 }
-
+.figure-caption {
+  float: left;
+}
 img {
     /* clear: both; */
     /* display: inline-block; */
@@ -23,7 +25,6 @@ img {
 }
 #gif-view {
     width: 900px;
-
 }
 p {
     /* clear: both; */
@@ -36,7 +37,6 @@ p {
   h1 {
       text-align: center;
       line-height: 150%;
-      /* padding-bottom: 5px; */
   }
   h3 {
       text-align: center;
@@ -47,7 +47,6 @@ p {
   }
   .btn {
       margin-left: 0px; 
-      /* margin-top: 20px; */
   }
   button:hover {
       background: darkblue;
@@ -123,7 +122,8 @@ function displayTopicInfo() {
           var rating = results[i].rating; 
             // setup variable, & assign it a "p" tag, with text for dom
           var pRating = $("<figcaption class = 'figure-caption'>").text("Rating: "+rating);
-          
+          // var pRating = $("<figcaption class = 'figure-caption'>").text("Rating here");
+          // var pRating = $("figure-caption").text("Rating: ZZZZ");
             // setup variable, & assign it a "div" tag with class name   
           var topicDiv = $("<div class='topicDiv'>");
             // setup variable, & assign "img" tag
@@ -133,15 +133,21 @@ function displayTopicInfo() {
           topicGif.attr("data-still",results[i].images.fixed_height_still.url);
           topicGif.attr("data-animate", results[i].images.fixed_height.url);
           topicGif.attr("data-state", "still");
-          topicGif.addClass("gif figure-img img-fluid rounded");  // assign class .gif for click event on images
+          topicGif.addClass("gif");
+          topicGif.addClass("figure-img img-fluid rounded");  
+          // assign class .gif for click event on images
         
           // topicDiv.prepend("<p>Rating: "+rating+"</p>");          
           //
-          topicDiv.append(pRating);
-          topicDiv.append(topicGif);
 
+          topicDiv.append(topicGif);  
+          // topicDiv.append(pRating);
+          // $(".figure").prepend(pRating); 
+          // $(".figure").prepend(topicGif);       
+         
           $("#gif-view").prepend(pRating); 
-          $("#gif-view").prepend(topicGif);       
+          $("#gif-view").prepend(topicGif); 
+
         }  // end if statement
       } // end for-Loop
     
