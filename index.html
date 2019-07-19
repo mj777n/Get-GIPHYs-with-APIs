@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>First Draft HW #6</title>
+  <title>Homework 6 / Giphy Search</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
   <!-- <link rel="stylesheet" type="text/css" href="Assets/style.css"> -->
 <style>
@@ -14,8 +14,9 @@
 }
 
 img {
-    /* /* clear: both; */
-    display: inline-block;
+    /* clear: both; */
+    /* display: inline-block; */
+    float: left;
     margin-left: 5px;
     margin-bottom: 20px;
     /* float: left; */ 
@@ -74,7 +75,12 @@ p {
 
   <div class="row">
     <div class="col-9 gif">
-      <div id="gif-view"></div>   
+      <figure class="figure" id="gif-view">
+
+        <!-- <div id="gif-view"> -->
+        <!-- </div> -->
+      </figure>
+         
     </div>
     
     <div class="col-3 text-right">
@@ -116,7 +122,8 @@ function displayTopicInfo() {
         {   // setup variable for rating        
           var rating = results[i].rating; 
             // setup variable, & assign it a "p" tag, with text for dom
-          var pRating = $("<p>").text("Rating: "+rating);
+          var pRating = $("<figcaption class = 'figure-caption'>").text("Rating: "+rating);
+          
             // setup variable, & assign it a "div" tag with class name   
           var topicDiv = $("<div class='topicDiv'>");
             // setup variable, & assign "img" tag
@@ -126,11 +133,12 @@ function displayTopicInfo() {
           topicGif.attr("data-still",results[i].images.fixed_height_still.url);
           topicGif.attr("data-animate", results[i].images.fixed_height.url);
           topicGif.attr("data-state", "still");
-          topicGif.addClass("gif");  // assign class .gif for click event on images
+          topicGif.addClass("gif figure-img img-fluid rounded");  // assign class .gif for click event on images
+        
           // topicDiv.prepend("<p>Rating: "+rating+"</p>");          
           //
           topicDiv.append(pRating);
-          topicDiv.prepend(topicGif);
+          topicDiv.append(topicGif);
 
           $("#gif-view").prepend(pRating); 
           $("#gif-view").prepend(topicGif);       
